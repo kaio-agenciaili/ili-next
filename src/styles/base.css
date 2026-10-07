@@ -1,0 +1,166 @@
+/* ============================================================
+   Base — tokens do tema WordPress + compatibilidade com o
+   Bootstrap Reboot (o tema original foi construído sobre ele).
+   ============================================================ */
+
+@layer base {
+  :root {
+    --background: #1b1c20;
+    --foreground: #fafafa;
+    --card: rgba(23, 23, 23, 0.4);
+    --card-dark: rgba(14, 17, 27, 0.35);
+    --card-container: #0d101a;
+    --primary: #d23089;
+    --primary2: #ee8656;
+    --primary-mid: #d9457c;
+    --secondary: #262626;
+    --secondary2: #494d93;
+    --secondary3: #1a1b3f;
+    --muted: #262626;
+    --muted-foreground: #a1a1a1;
+    --accent: #404040;
+    --border: #282828;
+    --input: #343434;
+    --ring: #737373;
+    --destructive: #f01e38;
+    --glow-blue: #3150aa;
+    --glow-orange: #ff2d78;
+    --glow-pink: #c830cc;
+    --deep-blue: #253a7a;
+    --gradient-main: linear-gradient(
+      106deg,
+      rgba(238, 134, 86, 1) 0%,
+      rgba(217, 69, 124, 1) 41%,
+      rgba(210, 48, 137, 1) 100%
+    );
+    --radius: 0.625rem;
+    --font-sans: var(--font-funnel-display), sans-serif;
+    --font-body: var(--font-funnel-display), sans-serif;
+    --font-accent: var(--font-trirong), serif;
+    --gradient-orange: linear-gradient(
+      135deg,
+      #e8562a 0%,
+      #e87b30 30%,
+      #f0a030 60%,
+      #f5c040 100%
+    );
+  }
+
+  /* --- Bootstrap Reboot (o que difere do preflight do Tailwind) --- */
+  body {
+    margin: 0;
+    font-size: 1rem;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: calc(1.375rem + 1.5vw);
+  }
+  h2 {
+    font-size: calc(1.325rem + 0.9vw);
+  }
+  h3 {
+    font-size: calc(1.3rem + 0.6vw);
+  }
+  h4 {
+    font-size: calc(1.275rem + 0.3vw);
+  }
+  h5 {
+    font-size: 1.25rem;
+  }
+  h6 {
+    font-size: 1rem;
+  }
+
+  @media (min-width: 1200px) {
+    h1 {
+      font-size: 2.5rem;
+    }
+    h2 {
+      font-size: 2rem;
+    }
+    h3 {
+      font-size: 1.75rem;
+    }
+    h4 {
+      font-size: 1.5rem;
+    }
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  ul,
+  ol {
+    padding-left: 2rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+
+  img,
+  svg {
+    display: inline;
+    vertical-align: middle;
+  }
+
+  /* --- Reset & Base (tema) --- */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, #333 1px, transparent 1px),
+      linear-gradient(to bottom, #333 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.15;
+    z-index: 1;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
