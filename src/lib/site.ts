@@ -1,3 +1,9 @@
+/**
+ * Indexação no Google só é liberada com ALLOW_INDEXING=true (no lançamento, no domínio oficial).
+ * Sem a variável, todas as páginas respondem noindex para não duplicar o site no ar.
+ */
+export const allowIndexing = process.env.ALLOW_INDEXING === "true";
+
 export const site = {
   name: "Agencia ili",
   email: "contato@agenciaili.com.br",

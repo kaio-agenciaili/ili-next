@@ -4,6 +4,7 @@ import { CursorGlow } from "@/components/effects/CursorGlow";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { allowIndexing } from "@/lib/site";
 import "./globals.css";
 
 const funnelDisplay = Funnel_Display({
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
   title: "agência ili | estratégia, marketing e performance",
   description:
     "Conectamos visão de negócio, dados e execução para transformar marketing em resultado real. Branding, mídia paga, conteúdo, design e tecnologia.",
+  robots: allowIndexing ? undefined : { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

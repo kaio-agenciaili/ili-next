@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Mesmo formato de URL do WordPress (/servicos/, /case/slug/) para não perder SEO.
   trailingSlash: true,
+  // Enquanto o site novo não substitui o oficial, nada deve ser indexado (evita conteúdo duplicado).
+  // Vale para tudo, inclusive imagens e arquivos; liberar com ALLOW_INDEXING=true no lançamento.
+  async headers() {
+    if (process.env.ALLOW_INDEXING === "true") return [];
+    return [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }];
+  },
   images: {
     remotePatterns: [
       {
