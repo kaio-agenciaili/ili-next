@@ -326,6 +326,191 @@ export async function getService(slug: string): Promise<Service | null> {
 }
 
 /* ------------------------------------------------------------------ */
+/* Blog                                                                */
+/* ------------------------------------------------------------------ */
+
+type WpTerm = { id: number; slug: string; name: string; taxonomy: string };
+
+type WpPost = WpPostBase & {
+  date: string;
+  categories: number[];
+  _embedded?: WpPostBase["_embedded"] & {
+    author?: { name: string; description: string; avatar_urls?: Record<string, string> }[];
+    "wp:term"?: WpTerm[][];
+  };
+};
+
+export type BlogCategory = { id: number; slug: string; name: string; description: string; seo: Seo };
+
+export type PostCard = {
+  id: number;
+  slug: string;
+  title: string;
+  /** Texto do `get_the_excerpt` (resumo manual ou o automático do WP). */
+  excerpt: string;
+  /** Data já no formato do WordPress ("13 de outubro de 2026"). */
+  date: string;
+  /** Tempo de leitura em minutos (mesma conta do tema). */
+  minutes: number;
+  /** Primeira categoria do post (`get_the_category()[0]`). */
+  category: { slug: string; name: string } | null;
+  image: CmsImage | null;
+};
+
+export type PostDetail = PostCard & {
+  contentHtml: string;
+  categoryIds: number[];
+  author: { name: string; bio: string; avatar: string | null };
+  seo: Seo;
+};
+
+const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+/** Formato de data do WordPress (`j \d\e F \d\e Y`) a partir da data local do post. */
+function formatWpDate(date: string): string {
+  const [y, m, d] = date.slice(0, 10).split("-").map(Number);
+  return `${d} de ${MONTHS[m - 1]} de ${y}`;
+}
+
+/** Mesma conta do tema: `str_word_count` do PHP (só letras ASCII contam como palavra) ÷ 200. */
+function readingMinutes(html: string): number {
+  const words = stripTags(html).match(/[A-Za-z'-]+/g)?.length ?? 0;
+  return Math.max(1, Math.ceil(Math.max(1, words) / 200));
+}
+
+function toPostCard(post: WpPost): PostCard {
+  const title = decodeEntities(post.title.rendered);
+  const term = post._embedded?.["wp:term"]?.flat().find((t) => t.taxonomy === "category");
+  return {
+    id: post.id,
+    slug: post.slug,
+    title,
+    excerpt: stripTags(post.excerpt.rendered),
+    date: formatWpDate(post.date),
+    minutes: readingMinutes(post.content.rendered),
+    category: term ? { slug: term.slug, name: decodeEntities(term.name) } : null,
+    image: featuredImage(post, title),
+  };
+}
+
+function toPostDetail(post: WpPost): PostDetail {
+  const author = post._embedded?.author?.[0];
+  const avatar = author?.avatar_urls?.["96"]?.replace(/([?&])s=\d+/, "$1s=160") ?? null;
+  return {
+    ...toPostCard(post),
+    contentHtml: post.content.rendered,
+    categoryIds: post.categories ?? [],
+    author: { name: author?.name ?? "", bio: author?.description ?? "", avatar },
+    seo: seoOf(post),
+  };
+}
+
+const POST_PARAMS = { _embed: "author,wp:featuredmedia,wp:term" };
+
+type PostQuery = { perPage?: number; page?: number; categories?: number[]; exclude?: number[] };
+
+/** Posts publicados, do mais recente para o mais antigo, com o total de páginas. */
+async function queryPosts({ perPage = 10, page = 1, categories, exclude }: PostQuery) {
+  const params: Record<string, string> = { ...POST_PARAMS, per_page: String(perPage), page: String(page) };
+  if (categories?.length) params.categories = categories.join(",");
+  if (exclude?.length) params.exclude = exclude.join(",");
+
+  const url = `${WP_URL}/wp-json/wp/v2/posts?${new URLSearchParams(params)}`;
+  const res = await fetch(url);
+  // Página além da última: a REST responde 400 (rest_post_invalid_page_number).
+  if (res.status === 400) return { posts: [] as WpPost[], totalPages: 0 };
+  if (!res.ok) throw new Error(`WordPress respondeu ${res.status} em ${url}`);
+  return { posts: (await res.json()) as WpPost[], totalPages: Number(res.headers.get("X-WP-TotalPages") ?? 1) };
+}
+
+export async function getCategories(): Promise<BlogCategory[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const terms = await wpFetch<(Omit<BlogCategory, "seo"> & { yoast_head_json?: Seo })[]>("categories", {
+    per_page: "100",
+    _fields: "id,slug,name,description,yoast_head_json",
+  });
+  return terms.map((t) => ({
+    id: t.id,
+    slug: t.slug,
+    name: decodeEntities(t.name),
+    description: stripTags(t.description),
+    seo: seoOf(t),
+  }));
+}
+
+export async function getCategory(slug: string): Promise<BlogCategory | null> {
+  const categories = await getCategories();
+  return categories.find((c) => c.slug === slug) ?? null;
+}
+
+export async function getLatestPosts(count: number, exclude: number[] = []): Promise<PostCard[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const { posts } = await queryPosts({ perPage: count, exclude });
+  return posts.map(toPostCard);
+}
+
+export async function getCategoryPosts(categoryId: number, count: number, exclude: number[] = []): Promise<PostCard[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const { posts } = await queryPosts({ perPage: count, categories: [categoryId], exclude });
+  return posts.map(toPostCard);
+}
+
+/** “continue lendo”: 3 posts mais recentes das mesmas categorias, sem o atual. */
+export async function getRelatedPosts(post: PostDetail): Promise<PostCard[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const { posts } = await queryPosts({ perPage: 3, categories: post.categoryIds, exclude: [post.id] });
+  return posts.map(toPostCard);
+}
+
+/** Arquivo da categoria, paginado como no WordPress (10 por página). */
+export async function getCategoryArchive(categoryId: number, page: number) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const { posts, totalPages } = await queryPosts({ perPage: 10, page, categories: [categoryId] });
+  return { posts: posts.map(toPostCard), totalPages };
+}
+
+export async function getPost(slug: string): Promise<PostDetail | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const posts = await wpFetch<WpPost[]>("posts", { ...POST_PARAMS, slug });
+  return posts[0] ? toPostDetail(posts[0]) : null;
+}
+
+/** Slugs de todos os posts publicados (para gerar as páginas no build). */
+export async function getPostSlugs(): Promise<string[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("posts");
+
+  const slugs: string[] = [];
+  for (let page = 1; ; page++) {
+    const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=100&page=${page}&_fields=slug`);
+    if (!res.ok) break;
+    const batch = (await res.json()) as { slug: string }[];
+    slugs.push(...batch.map((p) => p.slug));
+    if (page >= Number(res.headers.get("X-WP-TotalPages") ?? 1)) break;
+  }
+  return slugs;
+}
+
+/* ------------------------------------------------------------------ */
 /* Páginas                                                             */
 /* ------------------------------------------------------------------ */
 

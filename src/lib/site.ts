@@ -6,6 +6,8 @@ export const allowIndexing = process.env.ALLOW_INDEXING === "true";
 
 export const site = {
   name: "Agencia ili",
+  /** Endereço público do site (links de compartilhamento dos posts). */
+  url: "https://agenciaili.com.br",
   email: "contato@agenciaili.com.br",
   instagram: "https://www.instagram.com/",
   linkedin: "https://www.linkedin.com/",
@@ -28,6 +30,10 @@ export const routes = {
   diagnostico: "/diagnostico/",
   cases: "/cases/",
   politicaPrivacidade: "/politica-de-privacidade/",
+  blog: "/blog/",
+  /** Posts ficam na raiz, como no WordPress (`/%postname%/`). */
+  post: (slug: string) => `/${slug}/`,
+  categoria: (slug: string, page = 1) => (page > 1 ? `/category/${slug}/page/${page}/` : `/category/${slug}/`),
   metodo: "/#metodo",
   /** Single do CPT `ili_servicos` (slug `/servico/{slug}/`). */
   servico: (slug: string) => {

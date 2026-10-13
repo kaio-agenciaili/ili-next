@@ -15,7 +15,8 @@ const funnelDisplay = Funnel_Display({
 const trirong = Trirong({
   variable: "--font-trirong",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
+  // 300: citações dos posts (herdam o peso do parágrafo); 400/500: números e destaques.
+  weight: ["300", "400", "500"],
   style: ["normal", "italic"],
 });
 
