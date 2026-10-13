@@ -40,6 +40,15 @@
     }
   }
 
+  /* Equivalente ao .container-fluid do Bootstrap */
+  .container-fluid-ili {
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
   /* --- Text Gradient Utility --- */
   .text-grad {
     color: #dfe0e4;
@@ -230,7 +239,8 @@
       overflow-x: hidden;
       position: relative;
     }
-    .container-ili {
+    .container-ili,
+    .container-fluid-ili {
       padding-left: 30px !important;
       padding-right: 30px !important;
     }
@@ -692,6 +702,9 @@
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.65);
     margin-bottom: 0;
+  }
+  .csb-quote-author-line .text-accent {
+    font-style: normal;
   }
   .cases-testimonial-person {
     display: grid;
@@ -1605,6 +1618,40 @@
     transition:
       opacity 0.8s ease,
       transform 0.8s ease;
+  }
+
+  /* --- Depoimentos (página de cases) — carousel com fade --- */
+  .csb-quote-carousel {
+    position: relative;
+  }
+  .csb-quote-nav {
+    margin-top: 1.25rem;
+  }
+  .csb-quote-track {
+    position: relative;
+    min-height: 1px;
+    transition: height 0.45s ease;
+  }
+  .quote-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.45s ease,
+      visibility 0s linear 0.45s;
+  }
+  .quote-slide--active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.45s ease,
+      visibility 0s linear 0s;
   }
 
   .reveal.visible {
@@ -3200,8 +3247,310 @@
   }
 
   /* ============================================================
-     Páginas internas — “voltar” e CTA final (Case Single no original)
+     Cases — Página Listagem
      ============================================================ */
+
+  /* --- Tag --- */
+  .cp-tag {
+    font-family: var(--font-sans);
+    font-size: 9.9px;
+    font-weight: 600;
+    letter-spacing: 0.397px;
+    color: #666;
+    background: #e8e9ee;
+    border-radius: 100px;
+    padding: 4px 12px;
+  }
+
+  /* --- Stat --- */
+  .cp-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .cp-stat strong {
+    color: #ed6828;
+    font-family: var(--font-sans);
+    font-size: 25.6px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.512px;
+  }
+
+  .cp-stat span {
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* --- Bloco do case: imagem + body separados --- */
+  .cp-block {
+    display: flex;
+    flex-direction: column;
+    background: rgba(14, 17, 27, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.4s ease;
+  }
+
+  .cp-block:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Imagem com tags flutuando */
+  .cp-block-img {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cp-block-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .cp-block:hover .cp-block-img img {
+    transform: scale(1.03);
+  }
+
+  .cp-block-img-tags {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    z-index: 2;
+  }
+
+  /* Body — conteúdo abaixo da imagem */
+  .cp-block-body {
+    padding: 1.75rem 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cp-block-title {
+    font-family: var(--font-body);
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 0.6rem;
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+  }
+
+  .cp-block-title--lg {
+    font-size: clamp(1.65rem, 3.5vw, 2.75rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.9rem;
+  }
+
+  .cp-block-desc {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+    max-width: 600px;
+  }
+
+  .cp-block-stats {
+    display: flex;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: auto;
+  }
+
+  /* --- Tamanhos: 12 colunas e 6 colunas --- */
+  .cp-feat {
+    padding: 0 0 5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cp-block--12 .cp-block-img {
+    height: clamp(320px, 40vh, 440px);
+  }
+
+  .cp-block--12 .cp-block-body {
+    padding: 2rem 2.5rem;
+  }
+
+  .cp-block--6 .cp-block-img {
+    height: clamp(220px, 28vh, 320px);
+  }
+
+  /* --- Outros cases --- */
+  .cp-others {
+    padding: 0 0 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cp-others-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .cp-others-grid .cp-block--12 {
+    grid-column: 1 / -1;
+  }
+
+  /* --- CTA --- */
+  .cp-cta {
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cp-cta::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(210, 48, 137, 0.1) 0%,
+      transparent 65%
+    );
+    pointer-events: none;
+  }
+
+  .cp-cta-inner {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+    position: relative;
+  }
+
+  .cp-cta-label {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    background: var(--gradient-orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.25rem;
+  }
+
+  .cp-cta-heading {
+    font-family: var(--font-body);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 400;
+    color: #dfe0e4;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+  }
+
+  .cp-cta-desc {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2.5rem;
+  }
+
+  /* --- Responsive cases page --- */
+  @media (max-width: 991.98px) {
+    .cp-block--12 .cp-block-img {
+      height: 300px;
+    }
+    .cp-block--6 .cp-block-img {
+      height: 240px;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .cp-others-grid {
+      grid-template-columns: 1fr;
+    }
+    .cp-block--12 .cp-block-img {
+      height: 240px;
+    }
+    .cp-block--12 .cp-block-body {
+      padding: 1.5rem;
+    }
+    .cp-block--6 .cp-block-img {
+      height: 200px;
+    }
+    .cp-block-title--lg {
+      font-size: 1.5rem;
+    }
+    .cp-block-stats {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .cp-cta-inner {
+      padding: 4rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .cp-block--12 .cp-block-img {
+      height: 200px;
+    }
+    .cp-block--6 .cp-block-img {
+      height: 170px;
+    }
+    .cp-block-body {
+      padding: 1.25rem;
+    }
+  }
+
+  /* ============================================================
+     Case Single (e "voltar"/CTA final reaproveitados em outras internas)
+     ============================================================ */
+
+  /* --- Stagger (o tema não tem o script que adiciona .cs-stagger-visible;
+         na prática o .csb-stat abaixo reaparece com opacity:1 e fica 20px abaixo) --- */
+  .cs-stagger {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+  }
+
+  .cs-stagger.cs-stagger-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- Blocos base --- */
+  .csb {
+    padding: 2.5rem 0;
+  }
+
+  /* --- Hero --- */
+  .cs-hero {
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: right center;
+    padding-top: 450px;
+  }
 
   .cs-back {
     display: inline-flex;
@@ -3218,6 +3567,336 @@
 
   .cs-back:hover {
     color: rgba(255, 255, 255, 0.8);
+  }
+
+  .cs-hero-title {
+    font-family: var(--font-body);
+    font-size: 56px;
+    font-weight: 400;
+    color: #dfe0e4;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    margin-bottom: 40px;
+  }
+
+  .cs-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 70px;
+  }
+
+  .cs-tag {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.397px;
+    line-height: 12.4px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.04) 100%),
+      #1b1c20;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  /* ===== BLOCOS ACF ===== */
+
+  /* --- csb-text: split título | conteúdo --- */
+  .csb-text-split {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: 2rem;
+  }
+
+  .csb-text-label {
+    position: sticky;
+    top: 6rem;
+    align-self: start;
+  }
+
+  .csb-text-label h2 {
+    font-family: var(--font-body);
+    font-size: 40px;
+    font-weight: 500;
+    color: #a1a1a1;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 48px;
+    opacity: 0.31;
+  }
+
+  .csb-text-content p {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.85;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.25rem;
+  }
+
+  .csb-text-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* --- csb-img-full — 12 colunas --- */
+  .csb-img-full img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 1rem;
+    object-fit: cover;
+    max-height: 820px;
+  }
+
+  /* --- csb-img-double — 6+6 colunas --- */
+  .csb-img-double img {
+    width: 100%;
+    height: 580px;
+    display: block;
+    border-radius: 1rem;
+    object-fit: cover;
+  }
+
+  /* --- csb-quote — split: label + bloco --- */
+  .csb-quote {
+    padding: 2.5rem 0;
+  }
+
+  .csb-quote-split {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .csb-quote-label {
+    position: sticky;
+    top: 6rem;
+  }
+
+  .csb-quote-label h2 {
+    font-family: var(--font-body);
+    font-size: 40px;
+    font-weight: 500;
+    color: #a1a1a1;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.3;
+    opacity: 0.31;
+  }
+
+  .csb-quote blockquote {
+    margin: 0;
+    padding: 2rem 2.5rem;
+    background: linear-gradient(
+      135deg,
+      rgba(210, 48, 137, 0.05) 0%,
+      rgba(238, 134, 86, 0.03) 50%,
+      transparent 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .csb-quote blockquote::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gradient-main);
+    border-radius: 3px;
+  }
+
+  .csb-quote blockquote::after {
+    content: "\201C";
+    position: absolute;
+    top: 0.5rem;
+    right: 1.5rem;
+    font-family: var(--font-accent);
+    font-size: 5rem;
+    line-height: 1;
+    background: var(--gradient-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .csb-quote blockquote p {
+    font-family: var(--font-accent);
+    font-size: 1.05rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.25rem;
+    line-height: 1.75;
+    position: relative;
+  }
+
+  .csb-quote-author {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .csb-quote-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    background-image: var(--gradient-main);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+  }
+
+  .csb-quote-author strong {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: -0.01em;
+  }
+
+  .csb-quote-author span {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  /* --- csb-stats — split: label + grid --- */
+  .csb-stats-split {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .csb-stats-label {
+    position: sticky;
+    top: 6rem;
+  }
+
+  .csb-stats-label h2 {
+    font-family: var(--font-body);
+    font-size: 40px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .csb-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .csb-stat {
+    padding: 1.75rem;
+    background: var(--card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    opacity: 1;
+  }
+
+  .csb-stat::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-main);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+
+  .csb-stat:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .csb-stat:hover::after {
+    transform: scaleX(1);
+  }
+
+  .csb-stat-num {
+    font-family: var(--font-body);
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    background: var(--gradient-orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .csb-stat-label {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.5;
+  }
+
+  /* ===== SEÇÕES FIXAS ===== */
+  .cs-section {
+    padding: 5rem 0;
+  }
+
+  .cs-section-title {
+    font-family: var(--font-body);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 400;
+    color: #dfe0e4;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* --- Related Cases --- */
+  .cs-related {
+    padding-bottom: 2rem;
+  }
+
+  .cs-related-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .cs-related-header--center {
+    position: relative;
+    justify-content: center;
+  }
+
+  .cs-related-header--center .cs-section-title {
+    text-align: center;
+    width: 100%;
+  }
+
+  .cs-related-header .cs-section-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    margin: 0;
   }
 
   /* --- CTA Final (full width) --- */
@@ -3282,7 +3961,76 @@
     margin-bottom: 2.5rem;
   }
 
+  /* --- Case Responsive --- */
+  @media (max-width: 991.98px) {
+    .cs-hero {
+      padding: 8rem 0 2rem;
+    }
+    .csb-text-split {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+    .csb-text-label {
+      position: relative;
+      top: auto;
+    }
+    .csb-img-double img {
+      height: 240px;
+    }
+    .csb-stats-split {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+    .csb-stats-label {
+      position: relative;
+      top: auto;
+    }
+    .csb-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   @media (max-width: 575.98px) {
+    .cs-hero {
+      padding: 7rem 0 1.5rem;
+    }
+    .cs-hero-title {
+      font-size: 2rem;
+    }
+    .csb {
+      padding: 1.5rem 0;
+    }
+    .csb-img-full img {
+      border-radius: 0.65rem;
+      max-height: 300px;
+    }
+    .csb-img-double img {
+      height: 180px;
+      border-radius: 0.65rem;
+    }
+    .csb-quote-split {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+    .csb-quote-label {
+      position: relative;
+      top: auto;
+    }
+    .csb-quote blockquote {
+      padding: 1.5rem 1.25rem;
+    }
+    .csb-quote blockquote::after {
+      font-size: 3.5rem;
+      right: 0.9rem;
+    }
+    .csb-stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .cs-related-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
     .cs-cta-inner {
       padding: 4rem 1.25rem;
     }
@@ -3442,6 +4190,9 @@
     object-position: center top;
     border-radius: 1.125rem;
     display: block;
+  }
+  .cases-nav.csb-quote-nav.reveal.visible {
+    margin-top: 70px;
   }
 
   /* --- Metodologia --- */

@@ -31,6 +31,8 @@ export const routes = {
   cases: "/cases/",
   politicaPrivacidade: "/politica-de-privacidade/",
   blog: "/blog/",
+  /** Single do CPT `ili_case` (slug `/case/{slug}/`). */
+  caso: (slug: string) => `/case/${slug}/`,
   /** Posts ficam na raiz, como no WordPress (`/%postname%/`). */
   post: (slug: string) => `/${slug}/`,
   categoria: (slug: string, page = 1) => (page > 1 ? `/category/${slug}/page/${page}/` : `/category/${slug}/`),

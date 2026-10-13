@@ -44,14 +44,29 @@ type WpRepeater<T> = T[] | false | null | undefined;
 
 type WpCase = WpPostBase & {
   acf: {
+    titulo?: string;
     banner?: WpMedia;
     lista_resultados?: WpRepeater<{ numero?: string; descricao?: string }>;
     tags?: WpRepeater<{ tag?: string }>;
+    banner_desafio?: WpMedia;
+    titulo_desafio?: string;
+    texto_desafio?: string;
+    two_img?: WpRepeater<{ imagem?: WpMedia }>;
+    titulo_resolver?: string;
+    texto_resolver?: string;
+    full_imagem?: WpMedia;
+    titulo_estrategia?: string;
+    texto_estrategia?: string;
+    titulo_depoimento?: string;
     texto_depoimento?: string;
     nome?: string;
     cargo?: string;
     empresa?: string;
     foto?: WpMedia;
+    imagens_solucoes?: WpRepeater<{ imagem?: WpMedia }>;
+    titulo_solucoes?: string;
+    texto_solucoes?: string;
+    titulo_resultados?: string;
   };
 };
 
@@ -254,6 +269,135 @@ export async function getCasesByIds(ids: number[]): Promise<CaseSlide[]> {
     per_page: String(ids.length),
   });
   return posts.map(toCaseSlide);
+}
+
+/** Case no formato dos cards (listagem /cases/ e “veja outros cases”). */
+export type CaseCard = {
+  id: number;
+  slug: string;
+  title: string;
+  banner: CmsImage | null;
+  tags: string[];
+  /** Até 3 resultados. */
+  stats: { numero: string; descricao: string }[];
+  /** Resumo manual (sem tags) ou "" quando não há. */
+  manualExcerpt: string;
+  /** Texto do conteúdo, sem tags. */
+  contentText: string;
+};
+
+/** Bloco de texto das seções do case: título (HTML) + texto do editor (HTML). Vazio = não aparece. */
+export type CaseTextBlock = { titleHtml: string; textHtml: string };
+
+export type CaseDetail = CaseCard & {
+  hero: { titleHtml: string; bannerUrl: string };
+  challenge: { image: CmsImage | null } & CaseTextBlock;
+  solve: { images: CmsImage[] } & CaseTextBlock;
+  strategy: { image: CmsImage | null } & CaseTextBlock;
+  testimonial: {
+    titleHtml: string;
+    textHtml: string;
+    name: string;
+    role: string;
+    company: string;
+    photo: CmsImage | null;
+  };
+  solutions: { images: CmsImage[] } & CaseTextBlock;
+  results: { titleHtml: string; items: { numeroHtml: string; descricao: string }[] };
+  seo: Seo;
+};
+
+/** Considera vazio um HTML que não tem texto (como o `trim(wp_strip_all_tags())` do tema). */
+function htmlOrEmpty(value: unknown): string {
+  const html = text(value);
+  return stripTags(html) === "" ? "" : html;
+}
+
+function rowImages(value: WpRepeater<{ imagem?: WpMedia }>): CmsImage[] {
+  return rows(value)
+    .map((row) => toImage(row?.imagem, ""))
+    .filter((img): img is CmsImage => img !== null);
+}
+
+function toCaseCard(post: WpCase): CaseCard {
+  const acf = post.acf ?? {};
+  const title = decodeEntities(post.title.rendered);
+  return {
+    id: post.id,
+    slug: post.slug,
+    title,
+    banner: toImage(acf.banner, title) ?? featuredImage(post, title),
+    tags: tagsOf(acf.tags),
+    stats: rows(acf.lista_resultados)
+      .map((row) => ({ numero: clean(row?.numero), descricao: clean(row?.descricao) }))
+      .filter((row) => row.numero !== "" || row.descricao !== "")
+      .slice(0, 3),
+    manualExcerpt: stripTags(manualExcerpt(post)),
+    contentText: stripTags(post.content.rendered),
+  };
+}
+
+function toCaseDetail(post: WpCase): CaseDetail {
+  const acf = post.acf ?? {};
+  const card = toCaseCard(post);
+  return {
+    ...card,
+    hero: { titleHtml: htmlOrEmpty(acf.titulo), bannerUrl: acf.banner ? acf.banner.url : "" },
+    challenge: {
+      image: toImage(acf.banner_desafio, ""),
+      titleHtml: htmlOrEmpty(acf.titulo_desafio),
+      textHtml: htmlOrEmpty(acf.texto_desafio),
+    },
+    solve: {
+      images: rowImages(acf.two_img),
+      titleHtml: htmlOrEmpty(acf.titulo_resolver),
+      textHtml: htmlOrEmpty(acf.texto_resolver),
+    },
+    strategy: {
+      image: toImage(acf.full_imagem, ""),
+      titleHtml: htmlOrEmpty(acf.titulo_estrategia),
+      textHtml: htmlOrEmpty(acf.texto_estrategia),
+    },
+    testimonial: {
+      titleHtml: htmlOrEmpty(acf.titulo_depoimento),
+      textHtml: htmlOrEmpty(acf.texto_depoimento),
+      name: clean(acf.nome),
+      role: clean(acf.cargo),
+      company: clean(acf.empresa),
+      photo: toImage(acf.foto, clean(acf.nome)),
+    },
+    solutions: {
+      images: rowImages(acf.imagens_solucoes),
+      titleHtml: htmlOrEmpty(acf.titulo_solucoes),
+      textHtml: htmlOrEmpty(acf.texto_solucoes),
+    },
+    results: {
+      titleHtml: htmlOrEmpty(acf.titulo_resultados),
+      // Na página interna o tema mostra todos os resultados (nos cards, só 3).
+      items: rows(acf.lista_resultados)
+        .map((row) => ({ numeroHtml: text(row?.numero), descricao: clean(row?.descricao) }))
+        .filter((row) => row.numeroHtml !== "" || row.descricao !== ""),
+    },
+    seo: seoOf(post),
+  };
+}
+
+/** Todos os cases publicados, do mais recente para o mais antigo. */
+async function getAllCases(): Promise<WpCase[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("cases");
+
+  return wpFetch<WpCase[]>("ili_case", { ...CASE_PARAMS, per_page: "100", orderby: "date", order: "desc" });
+}
+
+export async function getCaseCards(): Promise<CaseCard[]> {
+  return (await getAllCases()).map(toCaseCard);
+}
+
+export async function getCase(slug: string): Promise<CaseDetail | null> {
+  const post = (await getAllCases()).find((p) => p.slug === slug);
+  return post ? toCaseDetail(post) : null;
 }
 
 /* ------------------------------------------------------------------ */
