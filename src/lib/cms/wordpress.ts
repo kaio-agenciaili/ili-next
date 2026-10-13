@@ -329,6 +329,38 @@ export async function getService(slug: string): Promise<Service | null> {
 /* Páginas                                                             */
 /* ------------------------------------------------------------------ */
 
+/** ID de uma página do WordPress pelo slug. */
+async function getPageId(slug: string): Promise<number | null> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("pages");
+
+  const pages = await wpFetch<{ id: number }[]>("pages", { slug, _fields: "id" });
+  return pages[0]?.id ?? null;
+}
+
+/** Dados que o navegador precisa para enviar um formulário direto ao Contact Form 7. */
+export type Cf7Config = {
+  endpoint: string;
+  formId: number;
+  unitTag: string;
+  containerPost: number;
+};
+
+/**
+ * O envio sai do navegador do visitante direto para a REST do CF7 (como no tema),
+ * para o Flamingo continuar registrando IP e navegador reais do lead.
+ */
+export async function getCf7Config(formId: number, pageSlug: string): Promise<Cf7Config> {
+  const pageId = (await getPageId(pageSlug)) ?? 1;
+  return {
+    endpoint: `${WP_URL}/wp-json/contact-form-7/v1/contact-forms/${formId}/feedback`,
+    formId,
+    unitTag: `wpcf7-f${formId}-p${pageId}-o1`,
+    containerPost: pageId,
+  };
+}
+
 /** SEO (Yoast) de uma página do WordPress pelo slug. */
 export async function getPageSeo(slug: string): Promise<Seo> {
   "use cache";

@@ -124,6 +124,19 @@
     vertical-align: middle;
   }
 
+  label {
+    display: inline-block;
+  }
+
+  /* O preflight do Tailwind herda o letter-spacing nos campos; no Bootstrap eles ficam com o padrão. */
+  button,
+  input,
+  select,
+  optgroup,
+  textarea {
+    letter-spacing: normal;
+  }
+
   /* --- Reset & Base (tema) --- */
   html {
     scroll-behavior: smooth;
