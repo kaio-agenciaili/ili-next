@@ -1,4 +1,4 @@
-import { CasesSection } from "@/components/home/CasesSection";
+import { HomeCases } from "@/components/home/HomeCases";
 import { ClientLogos } from "@/components/home/ClientLogos";
 import { FinalCta } from "@/components/home/FinalCta";
 import { Hero } from "@/components/home/Hero";
@@ -17,7 +17,7 @@ export default function HomePage() {
       <ClientLogos />
       <Pains />
       <WholeSolution />
-      <CasesSection />
+      <HomeCases />
       <ServicesSection />
       <Method />
       <Team />

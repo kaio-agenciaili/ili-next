@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Reveal } from "@/components/effects/Reveal";
-import type { HomeCase } from "@/lib/cms/wordpress";
+import type { CaseSlide } from "@/lib/cms/wordpress";
 import { cx } from "@/lib/cx";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -26,7 +26,7 @@ function StatArrow() {
   );
 }
 
-function CaseSlide({ item }: { item: HomeCase }) {
+function SlideContent({ item }: { item: CaseSlide }) {
   const { testimonial, summary } = item;
   const showBubble = testimonial !== null || summary !== "";
 
@@ -105,7 +105,7 @@ function CaseSlide({ item }: { item: HomeCase }) {
   );
 }
 
-export function CasesCarousel({ cases }: { cases: HomeCase[] }) {
+export function CasesCarousel({ cases, variant = "home" }: { cases: CaseSlide[]; variant?: "home" | "service" }) {
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const current = useRef(0);
   const switching = useRef(false);
@@ -146,23 +146,39 @@ export function CasesCarousel({ cases }: { cases: HomeCase[] }) {
     }, SWITCH_MS);
   }
 
+  const navButtons = (
+    <>
+      <button type="button" className="cases-nav-btn" aria-label="Anterior" onClick={() => showSlide(current.current - 1, "left")}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+      <span className="cases-counter">
+        <span>{pad(currentNum)}</span> / <span>{cases.length > 0 ? pad(cases.length) : "00"}</span>
+      </span>
+      <button type="button" className="cases-nav-btn" aria-label="Próximo" onClick={() => showSlide(current.current + 1, "right")}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </button>
+    </>
+  );
+
+  // Home: navegação antes dos slides e com reveal. Serviço: navegação depois, sem reveal.
+  const nav =
+    variant === "home" ? (
+      <Reveal className="cases-nav cases-nav--bottom-right" aria-label="Navegação do carrossel de cases">
+        {navButtons}
+      </Reveal>
+    ) : (
+      <div className="cases-nav cases-nav--bottom-right" aria-label="Navegação do carrossel de cases">
+        {navButtons}
+      </div>
+    );
+
   return (
     <>
-      <Reveal className="cases-nav cases-nav--bottom-right" aria-label="Navegação do carrossel de cases">
-        <button type="button" className="cases-nav-btn" aria-label="Anterior" onClick={() => showSlide(current.current - 1, "left")}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </button>
-        <span className="cases-counter">
-          <span>{pad(currentNum)}</span> / <span>{cases.length > 0 ? pad(cases.length) : "00"}</span>
-        </span>
-        <button type="button" className="cases-nav-btn" aria-label="Próximo" onClick={() => showSlide(current.current + 1, "right")}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </button>
-      </Reveal>
+      {variant === "home" && nav}
 
       <div className="cases-carousel-track">
         {cases.map((item, i) => (
@@ -174,10 +190,12 @@ export function CasesCarousel({ cases }: { cases: HomeCase[] }) {
             className={cx("cases-slide", i === 0 && "cases-slide--active")}
             data-index={i}
           >
-            <CaseSlide item={item} />
+            <SlideContent item={item} />
           </div>
         ))}
       </div>
+
+      {variant === "service" && nav}
     </>
   );
 }

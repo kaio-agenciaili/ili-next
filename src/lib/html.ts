@@ -34,6 +34,11 @@ export function stripTags(html: string): string {
   ).trim();
 }
 
+/** Remove todas as tags exceto `<br>` (equivalente ao `wp_kses($html, ['br' => []])`). */
+export function keepOnlyLineBreaks(html: string): string {
+  return html.replace(/<(?!br\s*\/?>)[^>]*>/gi, "");
+}
+
 /** Equivalente ao `wp_trim_words`. */
 export function trimWords(text: string, count: number, more = "…"): string {
   const words = text.trim().split(/\s+/).filter(Boolean);

@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useRef } from "react";
-import { useLitOnScroll } from "@/components/effects/use-lit-on-scroll";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import { useLitOnScroll } from "./use-lit-on-scroll";
 
-export type TimelineItem = { title: string; desc: string; href: string };
-
-/** Cards de serviço em timeline vertical: acendem e preenchem a linha conforme o scroll. */
-export function ServicesTimeline({ items }: { items: TimelineItem[] }) {
+/**
+ * Timeline vertical (`.svc-right`): os `.svc-card` filhos acendem conforme o scroll
+ * e a linha gradiente cresce até o último card aceso.
+ */
+export function Timeline({ children }: { children: ReactNode }) {
   const rightRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
@@ -56,20 +56,7 @@ export function ServicesTimeline({ items }: { items: TimelineItem[] }) {
     <div ref={rightRef} className="svc-right">
       <div ref={lineRef} className="timeline-line" />
       <div ref={fillRef} className="timeline-line-fill" />
-
-      {items.map((item, i) => (
-        <div key={item.title} className="svc-card noise-overlay">
-          <div className="timeline-dot" />
-          <div className="svc-card-content">
-            <span className="svc-card-num">{String(i + 1).padStart(2, "0")}</span>
-            <h4 className="svc-card-title">{item.title}</h4>
-            <p className="svc-card-desc">{item.desc}</p>
-            <Link href={item.href} className="svc-card-btn">
-              conhecer serviço
-            </Link>
-          </div>
-        </div>
-      ))}
+      {children}
     </div>
   );
 }

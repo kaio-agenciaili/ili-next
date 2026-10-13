@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { Timeline } from "@/components/effects/Timeline";
 import { routes } from "@/lib/site";
-import { ServicesTimeline, type TimelineItem } from "./ServicesTimeline";
 
-const items: TimelineItem[] = [
+const items = [
   {
     title: "estruturar minha marca",
     desc: "uma marca que comunica com clareza, sustenta posicionamento e acompanha o nível atual do negócio.",
@@ -54,7 +54,21 @@ export function ServicesSection() {
           </Link>
         </div>
 
-        <ServicesTimeline items={items} />
+        <Timeline>
+          {items.map((item, i) => (
+            <div key={item.title} className="svc-card noise-overlay">
+              <div className="timeline-dot" />
+              <div className="svc-card-content">
+                <span className="svc-card-num">{String(i + 1).padStart(2, "0")}</span>
+                <h4 className="svc-card-title">{item.title}</h4>
+                <p className="svc-card-desc">{item.desc}</p>
+                <Link href={item.href} className="svc-card-btn">
+                  conhecer serviço
+                </Link>
+              </div>
+            </div>
+          ))}
+        </Timeline>
       </div>
     </div>
   );
