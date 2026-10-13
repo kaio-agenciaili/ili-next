@@ -19,7 +19,8 @@ const nextConfig: NextConfig = {
         protocol: wpUrl.protocol === "https:" ? "https" : "http",
         hostname: wpUrl.hostname,
         port: wpUrl.port,
-        pathname: `${wpUrl.pathname.replace(/\/$/, "")}/wp-content/uploads/**`,
+        // Os uploads nem sempre ficam na raiz: em produção estão em /ili/wp-content/uploads/.
+        pathname: "/**/wp-content/uploads/**",
       },
     ],
     // Em dev o WordPress roda no XAMPP (localhost), que o otimizador bloqueia por padrão.
