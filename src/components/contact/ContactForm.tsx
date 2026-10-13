@@ -35,7 +35,7 @@ export function ContactForm({ config }: { config: Cf7Config }) {
     }
 
     setSending(true);
-    const outcome = await submitCf7(config, new FormData(form), LABELS);
+    const outcome = await submitCf7(config, new FormData(form), { labels: LABELS });
     setResult(outcome);
     setSending(false);
     if (outcome.status === "success") form.reset();

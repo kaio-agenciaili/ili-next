@@ -2348,6 +2348,69 @@
     color: rgba(255, 255, 255, 0.45);
   }
 
+  /* --- FAQ (diagnóstico) --- */
+  .contact-faq {
+    padding: 0 0 6rem;
+  }
+
+  .contact-faq-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contact-faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .contact-faq-item:first-child {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .contact-faq-question {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #dfe0e4;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color 0.3s ease;
+  }
+
+  .contact-faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .contact-faq-question::after {
+    content: "+";
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+    margin-left: 1rem;
+    transition: color 0.3s ease;
+  }
+
+  .contact-faq-item[open] .contact-faq-question::after {
+    content: "−";
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .contact-faq-question:hover {
+    color: #fff;
+  }
+
+  .contact-faq-answer {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0 0 1.25rem;
+    margin: 0;
+  }
+
   /* --- Contato responsivo --- */
   @media (max-width: 991.98px) {
     .contact-split {

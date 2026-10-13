@@ -8,12 +8,28 @@ type Cf7Response = {
   invalid_fields?: { field?: string; message?: string }[] | Record<string, { message?: string; reason?: string }>;
 };
 
+type SubmitOptions = {
+  /** Traduz o nome do campo para o rótulo mostrado no erro. */
+  labels: Record<string, string>;
+  /** Mensagem de sucesso quando o CF7 não manda uma. */
+  successFallback?: string;
+  /** Mensagem quando o servidor responde erro sem detalhes. */
+  errorFallback?: (status: number | string) => string;
+};
+
 /**
  * Envia os campos para a REST do Contact Form 7 e traduz a resposta numa mensagem
  * para o visitante — mesma lógica do script que existia no tema.
- * `labels` traduz o nome do campo para o rótulo mostrado no erro.
  */
-export async function submitCf7(config: Cf7Config, fields: FormData, labels: Record<string, string>): Promise<Cf7Result> {
+export async function submitCf7(
+  config: Cf7Config,
+  fields: FormData,
+  {
+    labels,
+    successFallback = "mensagem enviada com sucesso.",
+    errorFallback = (status) => `não foi possível enviar (${status}). tente de novo ou use outro canal.`,
+  }: SubmitOptions,
+): Promise<Cf7Result> {
   const body = new FormData();
   body.append("_wpcf7", String(config.formId));
   body.append("_wpcf7_version", "");
@@ -38,7 +54,7 @@ export async function submitCf7(config: Cf7Config, fields: FormData, labels: Rec
   }
 
   if (data.status === "mail_sent") {
-    return { status: "success", message: data.message || "mensagem enviada com sucesso." };
+    return { status: "success", message: data.message || successFallback };
   }
 
   const parts: string[] = [];
@@ -60,7 +76,7 @@ export async function submitCf7(config: Cf7Config, fields: FormData, labels: Rec
   }
 
   if (parts.length === 0 && !res.ok) {
-    parts.push(`não foi possível enviar (${res.status || "?"}). tente de novo ou use outro canal.`);
+    parts.push(errorFallback(res.status || "?"));
   }
   return { status: "error", message: parts.join(" ") };
 }
